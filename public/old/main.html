@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Drawing</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="drawingCanvas" width="1000" height="1000"></canvas>
+
+    <script>
+    const canvas = document.getElementById('drawingCanvas');
+    const context = canvas.getContext('2d');
+    let existingData = []; // Initialize existingData
+
+    // Function to save drawing data to the server
+    function saveDrawing(data) {
+        fetch('index.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => response.text())
+            .then(message => console.log(message))
+            .catch(error => console.error('Error saving drawing data:', error));
+    }
+
+    // Function to draw a path on the canvas
+    function drawPath(path) {
+        path.forEach((point, index) => {
+            if (index === 0) {
+                context.beginPath(); // Start a new path
+                context.moveTo(point.x, point.y);
+            } else {
+                context.lineTo(point.x, point.y);
+            }
+            context.stroke();
+        });
+    }
+
+    // Function to draw existingData on the canvas
+    function drawExistingData() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        existingData.forEach(path => drawPath(path));
+    }
+
+    // Function to load existing drawing data from a JSON file
+    function loadDrawing() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'drawing_data.json', false);  // Synchronous request
+        xhr.send();
+
+        if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            if (Array.isArray(data)) {
+                existingData = data; // Update existingData
+                drawExistingData(); // Draw existingData on the canvas
+            } else {
+                console.error('Invalid data format:', data);
+            }
+        } else {
+            console.error('Error loading drawing data. Status:', xhr.status);
+        }
+    }
+
+    // Load existing drawing data on page load
+    loadDrawing();
+
+    // Array to store the current drawing path
+    let currentPath = [];
+
+    // Event listener for mouse down
+    canvas.addEventListener('mousedown', (event) => {
+        currentPath = [{ x: event.clientX, y: event.clientY }];
+    });
+
+    // Event listener for mouse move
+    canvas.addEventListener('mousemove', (event) => {
+        if (currentPath.length > 0) {
+            currentPath.push({ x: event.clientX, y: event.clientY });
+            drawExistingData();
+            drawPath(currentPath);
+        }
+    });
+
+    // Event listener for mouse up
+    canvas.addEventListener('mouseup', () => {
+        if (currentPath.length > 1) {
+            existingData.push(currentPath);
+            saveDrawing(existingData);
+        }
+        currentPath = [];
+    });
+</script>
+
+</body>
+</html>
