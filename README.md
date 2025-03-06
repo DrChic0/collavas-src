@@ -5,7 +5,7 @@
 
 # About
 
-Collavas is a node application that combines the well known aspects of minecraft's 2b2t and reddit's r/place into one. Making it a canvas filled with anarchy, no moderation, no admin tools, free to draw anything within the 10000x10000 canvas that is rendered in HTML5 and with JS.
+Collavas is a node application that combines the well known aspects of minecraft's 2b2t and reddit's r/place into one. Making it a canvas filled with anarchy, no moderation, no admin tools, free to draw anything within the 10000x10000 canvas that is rendered in HTML5 and with JS. The branch old-data (https://github.com/DrChic0/collavas-src/tree/old-data) includes the drawings.json file from 3/5/2025.
 
 ## Setup
 
